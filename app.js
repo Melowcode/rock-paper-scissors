@@ -4,6 +4,10 @@ const start = document.querySelector(".start");
 const playerScoreBoard = document.querySelector("#playerScore");
 const computerScoreBoard = document.querySelector("#ComputerScore");
 const playerOption = [...document.querySelectorAll(".player-button")];
+const computerOption = document.querySelectorAll(".computer-button");
+const cRockBtn = document.querySelector("#c-rock");
+const cPaperBtn = document.querySelector("#c-paper");
+const cScissorsBtn = document.querySelector("#c-scissors");
 const sayHand = document.querySelector("#sayHand");
 const choices = ["rock", "paper", "scissors"];
 const para = document.querySelector("#para");
@@ -15,45 +19,67 @@ start.addEventListener("click", (e) => {
   start.classList.add("fadeout");
 });
 
-function game() {
-  // get player choice on click
-  playerOption.forEach((option) => {
-    option.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const playerOption = e.target.closest(".player-button");
-      const playerChoice = playerOption.id;
-      // get computer choice
-      const computerChoice =
-        choices[Math.floor(Math.random() * choices.length)];
-      console.log(playerChoice);
-      console.log(computerChoice);
-      // compare player choice and computer choice
+playerOption.forEach((option) => option.addEventListener("click", playRound));
 
-      if (playerChoice === computerChoice) {
-        sayHand.innerText = "its a tie";
-      } else if (
-        (playerChoice === "rock" && computerChoice === "scissors") ||
-        (playerChoice === "paper" && computerChoice === "rock") ||
-        (playerChoice === "scissors" && computerChoice === "paper")
-      ) {
-        sayHand.innerText = `Player Won ${playerChoice} beats ${computerChoice}`;
-        playerScore += 1;
-        playerScoreBoard.textContent = playerScore;
-      } else {
-        sayHand.innerText = `Computer Won ${computerChoice} beats ${playerChoice}`;
-        computerScore += 1;
-        computerScoreBoard.textContent = computerScore;
-      }
+function playRound(e) {
+  const playerChoice = e.target.closest(".player-button");
 
-      if (playerScore === 5) {
-        para.textContent = "Player Win";
+  playerChoice.classList.add("active");
 
-        start.classList.remove("fadeout");
-      } else if (computerScore === 5) {
-        start.classList.remove("fadeout");
-        para.textContent = "Computer Win";
-      }
-    });
-  });
+  const playerSelection = playerChoice.id;
+  const computerSelection = getComputerChoice();
+  compareHands(playerSelection, computerSelection);
+  checkWinner(playerSelection, computerSelection);
+  console.log(playerSelection);
+  console.log(computerSelection);
 }
-game();
+
+function getPlayerChoice() {}
+
+function getComputerChoice() {
+  const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+
+  if (computerChoice === "rock") {
+    cRockBtn.classList.add("active");
+    cPaperBtn.classList.remove("active");
+    cScissorsBtn.classList.remove("active");
+  } else if (computerChoice === "paper") {
+    cRockBtn.classList.remove("active");
+    cScissorsBtn.classList.remove("active");
+    cPaperBtn.classList.add("active");
+  } else {
+    cRockBtn.classList.remove("active");
+    cScissorsBtn.classList.add("active");
+    cPaperBtn.classList.remove("active");
+  }
+  return computerChoice;
+}
+
+function compareHands(playerSelection, computerSelection) {
+  if (playerSelection === computerSelection) {
+    return "tie";
+  } else if (
+    (playerSelection === "rock" && computerSelection === "scissors") ||
+    (playerSelection === "paper" && computerSelection === "rock") ||
+    ((playerSelection === "scissors") === computerSelection) === "paper"
+  ) {
+    return "player";
+  } else {
+    return "computer";
+  }
+}
+
+function checkWinner(playerSelection, computerSelection) {
+  let winner = compareHands(playerSelection, computerSelection);
+  if (winner === "tie") {
+    sayHand.textContent = "Its a tie!";
+  } else if (winner === "player") {
+    playerScore++;
+    playerScoreBoard.textContent = playerScore;
+    sayHand.textContent = `Player Won ${playerSelection} beats ${computerSelection}`;
+  } else {
+    computerScore++;
+    computerScoreBoard.textContent = computerScore;
+    sayHand.textContent = `Computer Won ${computerSelection} beats ${playerSelection}`;
+  }
+}
